@@ -1,13 +1,15 @@
 /*Debugging quiz - File No: 2 */
 /* The program should correctly print the stored variable values */
 
-include<stdio.h>
+#include<stdio.h>
 
 int main(){
-	int switch = 3.14;7b = 9;
+	double Switch = 3.14;
+	int sevenb = 9;
 	char alphabet = 'k';
-	printf("%Lf\n",&switch)
-	printf("%u",&2b)
-	print("The ASCII value of character 'k' is : %d",'alphabet')
+	printf("%f\n", Switch);
+	printf("%i\n", sevenb);
+	int ascii = alphabet;
+	printf("The ASCII value of character 'k' is : %d", ascii);
 	return 0;
 }
