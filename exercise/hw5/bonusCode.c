@@ -1,3 +1,12 @@
+/****************************************************************
+Tony Carrasco
+11/28/17
+C291
+Assignment 5
+bonus
+bonusCode.c
+****************************************************************/
+
 #include <stdio.h>
 
 void displayBits(unsigned int value);
