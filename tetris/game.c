@@ -1,4 +1,4 @@
-/* game.c --- 
+/* game.c
  * 
  * Filename: game.c
  * Description: 
@@ -87,26 +87,56 @@ int game(void) {
       if ((arrow = read_escape(&c)) != NOCHAR) {
 	switch (arrow) {
 	case UP:
+          undisplay_tetromino(current);
+          rotate_cw(current);
+          display_tetromino(current);
 	  mvprintw(10,10,"UP            ");
 	  break;
 	case DOWN:
-	  mvprintw(10,10,"DOWN          ");
+	  undisplay_tetromino(current);
+          rotate_ccw(current);
+          display_tetromino(current);
+          mvprintw(10,10,"DOWN          ");
 	  break;
 	case LEFT:
-	  mvprintw(10,10,"LEFT          ");
+          undisplay_tetromino(current);
+	  move_tet(current, current->upper_left_x-1, current->upper_left_y);
+          display_tetromino(current);
+          mvprintw(10,10,"LEFT          ");
 	  break;
 	case RIGHT:
-	  mvprintw(10,10,"RIGHT         ");
-	  break;
-	case REGCHAR: 
-	  mvprintw(10,10,"REGCHAR 0x%02x",c);
-	  if (c == 'q') {
-	    state = EXIT;
- 	  }
+          undisplay_tetromino(current);
+          move_tet(current, current->upper_left_x+1, current->upper_left_y);
+          display_tetromino(current);
+          mvprintw(10, 10,"RIGHT        ");
+	case REGCHAR:
+          if (c == 0x2b){
+	    undraw_well(w);
+	    changeWellSize(w->upper_left_x, w->upper_left_y, w->width+(w->width/10), w->height, w);
+	    draw_well(w);
+	    mvprintw(10, 10, "WELL WIDTH+ ");}
+          else if (c == 0x5f){
+	    undraw_well(w);
+            changeWellSize(w->upper_left_x, w->upper_left_y, w->width-(w->width/10), w->height, w);
+            draw_well(w);
+            mvprintw(10, 10, "WELL WIDTH- "); } 
+	  else if (c == 0x20){
+            move_timeout = DROP_RATE;
+            }
+          else {
+            move_timeout = BASE_FALL_RATE;
+            mvprintw(10,10,"REGCHAR 0x%02x",c);
+	    if (c == 'q'){
+	      state = EXIT;
+ 	    }
+          }
 	}
       } 
       if (move_counter++ >= move_timeout) {
-	move_counter = 0;
+	undisplay_tetromino(current);
+	move_tet(current, current->upper_left_x, current->upper_left_y+1);
+	display_tetromino(current);	
+       move_counter = 0;
       }
       break;
     case EXIT:
