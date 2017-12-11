@@ -33,7 +33,7 @@
  */
 
 /* Code: */
-enum {NOCHAR, REGCHAR, UP, DOWN, LEFT, RIGHT, PLUS, MINUS, BADESC}; 
+enum {NOCHAR, REGCHAR, UP, DOWN, LEFT, RIGHT, PLUS, MINUS, PAUSE, BADESC}; 
 
 int read_escape(int *);
 

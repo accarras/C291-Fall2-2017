@@ -41,8 +41,29 @@
 #include <ncurses.h>
 #include "tetromino.h"
 
-const tetromino_t tetromino_types[7] = {
-  {"block",
+const tetromino_t tetromino_types[9] = {
+  
+{"short",
+  {{0,0,0,0},
+   {0,1,1,0},
+   {0,0,0,0},
+   {0,0,0,0}},
+  0,
+  0,
+  '%',
+  {0,0,0}},
+
+{"corner",
+  {{0,0,0,0},
+   {0,1,1,0},
+   {0,1,0,0},
+   {0,0,0,0}},
+  0,
+  0,
+  '%',
+  {0,0,0}},
+
+{"block",
    {{0,0,0,0}, 
     {0,1,1,0},
     {0,1,1,0},
@@ -51,7 +72,8 @@ const tetromino_t tetromino_types[7] = {
    0,
    '%',
    {0,0,0}},
-  {"tee",
+  
+{"tee",
    {{0,0,0,0}, 
     {1,1,1,0},
     {0,1,0,0},
@@ -60,7 +82,8 @@ const tetromino_t tetromino_types[7] = {
    0,
    '%',
    {0,0,0}},
-  {"zigzag_l",
+
+{"zigzag_l",
    {{0,0,1,0}, 
     {0,1,1,0},
     {0,1,0,0},
@@ -69,7 +92,8 @@ const tetromino_t tetromino_types[7] = {
    0,
    '%',
    {0,0,0}},
-  {"zigzag_r",
+
+{"zigzag_r",
    {{0,1,0,0}, 
     {0,1,1,0},
     {0,0,1,0},
@@ -78,7 +102,8 @@ const tetromino_t tetromino_types[7] = {
    0,
    '%',
    {0,0,0}},
-  {"lform_l",
+
+{"lform_l",
    {{0,0,1,0}, 
     {0,0,1,0},
     {0,1,1,0},
@@ -87,7 +112,8 @@ const tetromino_t tetromino_types[7] = {
    0,
    '%',
    {0,0,0}},
-  {"lform_r",
+
+{"lform_r",
    {{0,1,0,0}, 
     {0,1,0,0},
     {0,1,1,0},
@@ -96,7 +122,8 @@ const tetromino_t tetromino_types[7] = {
    0,
    '%',
    {0,0,0}},
-  {"pipe",
+  
+{"pipe",
    {{0,1,0,0},
     {0,1,0,0},
     {0,1,0,0},
@@ -181,7 +208,7 @@ int rotate_ccw(tetromino_t *tet) {
 tetromino_t *create_tetromino (int initial_x, int initial_y) {
   int type;
   tetromino_t *tet = malloc(sizeof(tetromino_t));
-  type = rand()%7;
+  type = rand()%9;
   memcpy(tet, &tetromino_types[type], sizeof(tetromino_t));
   tet->upper_left_x = initial_x;
   tet->upper_left_y = initial_y;

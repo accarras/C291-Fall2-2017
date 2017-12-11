@@ -89,6 +89,20 @@ void undisplay_score(int score, int x, int y) {
 }
 
 
+void display_time(int time, int x, int y) {
+  mvprintw(y,x,"*** TIME  ***",time);
+  mvprintw(y+1,x,"%8d",time);
+}
+
+
+void undisplay_time(int time, int x, int y) {
+  mvprintw(y,x,"             ",time);
+  mvprintw(y+1,x,"        ",time);
+}
+
+
+
+
 
 
 

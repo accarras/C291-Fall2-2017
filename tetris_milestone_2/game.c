@@ -66,6 +66,8 @@ highscore_t *game(highscore_t *highscores) {
   int lines_cleared = 0;
   int score = 0;
   char str[80];  
+  time_t start = time(0);  
+  int seconds_since_start = 0;
 
   while(1) {
     switch(state) {
@@ -78,39 +80,73 @@ highscore_t *game(highscore_t *highscores) {
       draw_well(w);
       srand(time(NULL));     // Seed the random number generator with the time. Used in create tet. 
       display_score(score, w->upper_left_x-15,w->upper_left_y);  
+      //seconds_since_start = difftime( time(0), start);
+      //display_time(seconds_since_start, w->upper_left_x-25, w->upper_left_y);
       state = ADD_PIECE;
       break;
     case ADD_PIECE:          // Add a new piece to the game
+      lines_cleared += prune_well(w);
+      undisplay_score(score, w->upper_left_x-15,w->upper_left_y);
+      score = compute_score(score, lines_cleared);
+      display_score(score, w->upper_left_x-15,w->upper_left_y);
+
+      undisplay_time(seconds_since_start, w->upper_left_x-25, w->upper_left_y);
+      seconds_since_start = difftime(time(0), start);
+      display_time(seconds_since_start, w->upper_left_x-25, w->upper_left_y);
+     
+      if (seconds_since_start >= 300){
+	state = GAME_OVER;
+	break;
+	}
+      
       if (next) {
 	current = next;
 	next = create_tetromino ((w->upper_left_x+(w->width/2)), w->upper_left_y);
+        if (check_collision(next) == COLLIDE){
+          state = GAME_OVER;
+          break;
+        }
       }
       else {
 	current = create_tetromino ((w->upper_left_x+(w->width/2)), w->upper_left_y);
 	next = create_tetromino ((w->upper_left_x+(w->width/2)), w->upper_left_y);
       }
       display_tetromino(current);
+
       state = MOVE_PIECE;
       break;
+    
     case MOVE_PIECE:     // Move the current piece 
+      undisplay_time(seconds_since_start, w->upper_left_x-25, w->upper_left_y);
+      seconds_since_start = difftime( time(0), start);
+      display_time(seconds_since_start, w->upper_left_x-25, w->upper_left_y);
+      if (seconds_since_start >= 300){
+	state = GAME_OVER;
+	break;
+      }
 
-      if ((arrow = read_escape(&c)) != NOCHAR) {
+
+      
+	if ((arrow = read_escape(&c)) != NOCHAR) {
 	switch (arrow) {
 	case UP:
 	  undisplay_tetromino(current);
 	  rotate_ccw(current);
 	  display_tetromino(current);
 	  break;
+
 	case DOWN:
 	  undisplay_tetromino(current);
 	  rotate_cw(current);
 	  display_tetromino(current);
 	  break;
+
 	case LEFT:
 	  undisplay_tetromino(current);
 	  move_tet(current,current->upper_left_x-1,current->upper_left_y);
 	  display_tetromino(current);
 	  break;
+
 	case RIGHT:
 	  undisplay_tetromino(current);
 	  move_tet(current,current->upper_left_x+1,current->upper_left_y);
@@ -118,7 +154,6 @@ highscore_t *game(highscore_t *highscores) {
 	  break;
 
 	case PLUS:
-	
           currentWellWidth = w->width + (w->width * 0.1);
           if(!(currentWellWidth > maximumWellWidth)) {
             undisplay_score(score, w->upper_left_x-15,w->upper_left_y);
@@ -140,6 +175,23 @@ highscore_t *game(highscore_t *highscores) {
 	    draw_well(w);
           } 
 	  break;
+	
+	case PAUSE:
+	  //nodelay(stdscr, FALSE);
+	  //clear();
+	  //getmaxyx(stdscr, y, x);
+	  //mvprintw(1, x/2-5, "GAME PAUSED");
+	  //mvprintw(2, x/2-5, "###########");
+	  //mvprintw(16,x/2-5, "Press to go");
+	  move_timeout = 10000;
+          
+	  //move_counter = 0;
+
+	  getch();
+	  move_timeout = BASE_FALL_RATE;
+	  state = ADD_PIECE;
+	  break;
+
 
 	case REGCHAR: 
 	  mvprintw(10,10,"REGCHAR 0x%02x",c);
@@ -158,19 +210,26 @@ highscore_t *game(highscore_t *highscores) {
 	status = move_tet(current,current->upper_left_x,current->upper_left_y+1);
 	display_tetromino(current);
 	if (status == MOVE_FAILED) {
-	  state = ADD_PIECE;
+	  lines_cleared+=prune_well(w);
+	  undisplay_score(score, w->upper_left_x-15,w->upper_left_y);
+	  score = compute_score(score, lines_cleared);
+	  display_score(score, w->upper_left_x-15,w->upper_left_y);
+          state = ADD_PIECE;
 	  move_timeout = BASE_FALL_RATE;
 	}
 	move_counter = 0;
       }
       break;
+    
     case GAME_OVER:
       nodelay(stdscr,FALSE);
       clear();
       getmaxyx(stdscr,y,x);
-      mvprintw(1,x/2-5,"  GAME_OVER  ");
-      mvprintw(2,x/2-5,"#############");
+      mvprintw(1,x/2-5, " GAME_OVER ");
+      mvprintw(2,x/2-5, "#############");
       mvprintw(16,x/2-5,"Hit q to exit");
+      //      mvprintw(3, x/2-5,"  Score is:  ");
+      display_score(score, x/2-5,4);
       getch(); // Wait for a key to be pressed. 
       state = EXIT;
       break;
@@ -179,6 +238,7 @@ highscore_t *game(highscore_t *highscores) {
       break;
     }
     refresh();
+    //    printf("time: %d", &tim);
     nanosleep(&tim,&tim_ret);
   }
 }

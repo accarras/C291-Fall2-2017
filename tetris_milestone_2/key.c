@@ -70,8 +70,10 @@ int read_escape(int *read_char) {
     *read_char = c;
     return (MINUS);
 
-  }
-  else {
+  } else if(c == 0x70){
+     *read_char = c;
+     return (PAUSE);
+  } else {
     *read_char = c;
     return (REGCHAR);
   }
